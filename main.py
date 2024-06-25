@@ -5,6 +5,8 @@ import time
 import numpy as np
 
 from ultralytics import YOLO
+
+HOME = os.getcwd() 
 print(HOME)
 os.chdir(HOME)
 
