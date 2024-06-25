@@ -5,15 +5,11 @@ import time
 import numpy as np
 
 from ultralytics import YOLO
-
-HOME = os.getcwd()
-data = os.path.join(HOME, 'data/plant')
-
 print(HOME)
 os.chdir(HOME)
 
 """## Train model"""
-subprocess.run(['yolo','task=classify', 'mode=train', 'model=yolov8m-cls.pt','data={data}','epochs=200', 'batch=16', 'imgsz=640', 'dropout=0.2', 'save=True', 'save_period=10'])
+subprocess.run(['yolo','task=classify', 'mode=train', 'model=yolov8m-cls.pt','data=home/ldtan/ldtan/PLANT50-ServerTrain/data/plant','epochs=200', 'batch=16', 'imgsz=640', 'dropout=0.2', 'save=True', 'save_period=10'])
 
 """## Validating model"""
 
