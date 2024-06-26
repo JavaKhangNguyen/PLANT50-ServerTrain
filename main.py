@@ -10,15 +10,18 @@ HOME = os.getcwd()
 print(HOME)
 os.chdir(HOME)
 
-"""## Train model"""
-subprocess.run(['yolo','task=classify', 'mode=train', 'model=yolov8m-cls.pt','data=home/ldtan/ldtan/PLANT50-ServerTrain/data/plant','epochs=200', 'batch=16', 'imgsz=640', 'dropout=0.2', 'save=True', 'save_period=10'])
+# """## Train model"""
+# subprocess.run(['yolo','task=classify', 'mode=train', 'model=yolov8m-cls.pt','data=home/ldtan/ldtan/PLANT50-ServerTrain/data/plant','epochs=200', 'batch=16', 'imgsz=640', 'dropout=0.2', 'save=True', 'save_period=10'])
 
 """## Validating model"""
 
 os.chdir(HOME)
 
-subprocess.run([sys.executable, 'eval.py', '--model', 'fasterrcnn_resnet50_fpn', '--weights', 'outputs/training/fasterRCNN_acne/best_model.pth', '--data', data])
-
+with open('valid.txt', 'w') as f:
+    result = subprocess.run(['yolo', 'task=classify', 'mode=valid', 'model=runs/classify/train/weights/best.pt', 'imgsz=640', 'data=home/ldtan/ldtan/PLANT50-ServerTrain/data/plant'], capture_output=True, text=True)
+    f.write(result.stdout)
+    f.write(result.stderr)
+  
 """## Inference model"""
 # Define the class names
 class_names = ['aloevera', 'amla', 'amruta balli', 'apple', 'ashwagandha', 'azadirachta indica', 'banana', 'bellpepper', 'betel piper', 'bilimbi', 'broccoli', 'cabbage', 'cantaloupe', 'carrot','cassava', 'cauliflower',
@@ -34,7 +37,7 @@ class_top1_accuracies = []
 
 for class_name in class_names:
     class_start_time = time.time()
-    class_path = os.path.join('data/plant/valid/', class_name)
+    class_path = os.path.join('home/ldtan/ldtan/PLANT50-ServerTrain/data/plant/valid/', class_name)
     class_results = model(source=class_path, imgsz=640)
     class_inference_time = time.time() - class_start_time
     class_inference_times.append(class_inference_time)
@@ -50,17 +53,18 @@ total_inference_time = time.time() - start_time
 average_class_inference_time = np.mean(class_inference_times)
 average_top1_accuracy = np.mean(class_top1_accuracies)
 
-print("Inference Results:")
-print("+-----------------------+----------------------+----------------------+")
-print("| Metric                | Value                |                      |")
-print("+-----------------------+----------------------+----------------------+")
-print(f"| Total number of classes         | {len(class_names)}                  |             |")
-print("| Total Inference Time            | {:.2f} seconds      |             |".format(total_inference_time))
-print("| Average Class Inference Time    | {:.2f} seconds       |             |".format(average_class_inference_time))
-print("| Average Accuracy                | {:.3f}               |             |".format(average_top1_accuracy))
-print("+-----------------------+----------------------+----------------------+")
-print("|        Class          |   Inference Time (s) |       Accuracy       |")
-print("+-----------------------+----------------------+----------------------+")
-for i, class_name in enumerate(class_names):
-    print("| {:<20}  | {:<20.2f} | {:<20.2f} |".format(class_name, class_inference_times[i], class_top1_accuracies[i]))
-print("+-----------------------+----------------------+----------------------+")
+with open('inference.txt', 'w') as f:
+    f.write("Inference Results:\n")
+    f.write("+-----------------------+----------------------+----------------------+\n")
+    f.write("| Metric                | Value                |                      |\n")
+    f.write("+-----------------------+----------------------+----------------------+\n")
+    f.write(f"| Total number of classes         | {len(class_names)}                  |             |\n")
+    f.write("| Total Inference Time            | {:.2f} seconds      |             |\n".format(total_inference_time))
+    f.write("| Average Class Inference Time    | {:.2f} seconds       |             |\n".format(average_class_inference_time))
+    f.write("| Average Accuracy                | {:.3f}               |             |\n".format(average_top1_accuracy))
+    f.write("+-----------------------+----------------------+----------------------+\n")
+    f.write("|        Class          |   Inference Time (s) |       Accuracy       |\n")
+    f.write("+-----------------------+----------------------+----------------------+\n")
+    for i, class_name in enumerate(class_names):
+        f.write("| {:<20}  | {:<20.2f} | {:<20.2f} |\n".format(class_name, class_inference_times[i], class_top1_accuracies[i]))
+    f.write("+-----------------------+----------------------+----------------------+\n")
