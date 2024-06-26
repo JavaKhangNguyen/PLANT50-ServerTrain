@@ -37,7 +37,7 @@ class_top1_accuracies = []
 
 for class_name in class_names:
     class_start_time = time.time()
-    class_path = os.path.join('home/ldtan/ldtan/PLANT50-ServerTrain/data/plant/valid/', class_name)
+    class_path = os.path.join('home/ldtan/ldtan/PLANT50-ServerTrain/data/plant/test/', class_name)
     class_results = model(source=class_path, imgsz=640)
     class_inference_time = time.time() - class_start_time
     class_inference_times.append(class_inference_time)
