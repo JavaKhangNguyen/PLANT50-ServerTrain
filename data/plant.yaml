@@ -1,5 +1,5 @@
 train: train/
-valid: valid/
+val: valid/
 test: test/
 
 nc: 50
